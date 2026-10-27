@@ -1,11 +1,14 @@
 package com.example.lab02_kalkulator
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
+
+    private val TAG = "CalculatorDebug" // Tag do filtrowania w Logcat
 
     private lateinit var tvResult: TextView
     private var currentInput = ""
@@ -17,9 +20,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        Log.d(TAG, "Aplikacja została uruchomiona.")
         tvResult = findViewById(R.id.tvResult)
 
-        // Jawnie zdefiniowana lista przycisków numerycznych
+        // 1. Obsługa przycisków cyfr (0-9)
         val numberButtons = listOf(
             Pair(R.id.btn0, "0"),
             Pair(R.id.btn1, "1"),
@@ -41,46 +45,26 @@ class MainActivity : AppCompatActivity() {
                 }
                 currentInput += digit
                 tvResult.text = currentInput
+                Log.d(TAG, "Kliknięto cyfrę: $digit, aktualny input: $currentInput")
             }
         }
 
-        // Przycisk czyszczenia (C)
+        // 2. Przycisk czyszczenia (C)
         findViewById<Button>(R.id.btnC).setOnClickListener {
             currentInput = ""
             firstValue = 0.0
             currentOperator = ""
             tvResult.text = "0"
             isNewOperation = true
+            Log.d(TAG, "Wyczyszczono kalkulator (Reset).")
         }
 
-        findViewById<Button>(R.id.btnOne).setOnClickListener {
-            currentInput = currentInput.dropLast(1)
-            tvResult.text = currentInput
-        }
-
-        // Operatory arytmetyczne
+        // 3. Obsługa operatorów arytmetycznych (+, *, /)
         val operatorButtons = listOf(
             Pair(R.id.btnPlus, "+"),
             Pair(R.id.btnMultiply, "*"),
-            Pair(R.id.btnDivide, "/"),
-            Pair(R.id.btnMinus, "-")
+            Pair(R.id.btnDivide, "/")
         )
-
-        // Zmiana znaku (+/-)
-        findViewById<Button>(R.id.btnPlusMinus).setOnClickListener {
-            val value = currentInput.toDoubleOrNull() ?: 0.0
-            currentInput = (-value).toString()
-            tvResult.text = currentInput
-            isNewOperation = false
-        }
-
-        // Procent (%)
-        findViewById<Button>(R.id.btnP).setOnClickListener {
-            val value = currentInput.toDoubleOrNull() ?: 0.0
-            currentInput = (value / 100).toString()
-            tvResult.text = currentInput
-            isNewOperation = false
-        }
 
         for ((id, op) in operatorButtons) {
             findViewById<Button>(id).setOnClickListener {
@@ -88,23 +72,27 @@ class MainActivity : AppCompatActivity() {
                     firstValue = currentInput.toDouble()
                     currentOperator = op
                     isNewOperation = true
+                    Log.d(TAG, "Wybrano operator: $op, zapamiętana wartość: $firstValue")
                 }
             }
         }
 
-        // Przycisk równa się (=)
+        // 4. Przycisk równa się (=) – obliczenia i wynik
         findViewById<Button>(R.id.btnEquals).setOnClickListener {
             if (currentInput.isNotEmpty() && currentOperator.isNotEmpty()) {
                 val secondValue = currentInput.toDouble()
+                Log.d(TAG, "Wykonywanie obliczenia: $firstValue $currentOperator $secondValue")
+
                 val result = when (currentOperator) {
                     "+" -> firstValue + secondValue
                     "*" -> firstValue * secondValue
-                    "-" -> firstValue - secondValue
                     "/" -> if (secondValue != 0.0) firstValue / secondValue else 0.0
                     else -> 0.0
-
                 }
+
                 tvResult.text = if (result % 1.0 == 0.0) result.toInt().toString() else result.toString()
+                Log.d(TAG, "Wynik operacji: ${tvResult.text}")
+
                 currentInput = tvResult.text.toString()
                 currentOperator = ""
                 isNewOperation = true

@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LAB02-Kalkulator"
+rootProject.name = "LAB03-Kalkulator"
 include(":app")
