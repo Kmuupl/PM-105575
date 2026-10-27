@@ -53,12 +53,34 @@ class MainActivity : AppCompatActivity() {
             isNewOperation = true
         }
 
+        findViewById<Button>(R.id.btnOne).setOnClickListener {
+            currentInput = currentInput.dropLast(1)
+            tvResult.text = currentInput
+        }
+
         // Operatory arytmetyczne
         val operatorButtons = listOf(
             Pair(R.id.btnPlus, "+"),
             Pair(R.id.btnMultiply, "*"),
-            Pair(R.id.btnDivide, "/")
+            Pair(R.id.btnDivide, "/"),
+            Pair(R.id.btnMinus, "-")
         )
+
+        // Zmiana znaku (+/-)
+        findViewById<Button>(R.id.btnPlusMinus).setOnClickListener {
+            val value = currentInput.toDoubleOrNull() ?: 0.0
+            currentInput = (-value).toString()
+            tvResult.text = currentInput
+            isNewOperation = false
+        }
+
+        // Procent (%)
+        findViewById<Button>(R.id.btnP).setOnClickListener {
+            val value = currentInput.toDoubleOrNull() ?: 0.0
+            currentInput = (value / 100).toString()
+            tvResult.text = currentInput
+            isNewOperation = false
+        }
 
         for ((id, op) in operatorButtons) {
             findViewById<Button>(id).setOnClickListener {
@@ -77,8 +99,10 @@ class MainActivity : AppCompatActivity() {
                 val result = when (currentOperator) {
                     "+" -> firstValue + secondValue
                     "*" -> firstValue * secondValue
+                    "-" -> firstValue - secondValue
                     "/" -> if (secondValue != 0.0) firstValue / secondValue else 0.0
                     else -> 0.0
+
                 }
                 tvResult.text = if (result % 1.0 == 0.0) result.toInt().toString() else result.toString()
                 currentInput = tvResult.text.toString()
