@@ -23,6 +23,21 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "Aplikacja została uruchomiona.")
         tvResult = findViewById(R.id.tvResult)
 
+        // Obsługa przecinka dziesiętnego
+        findViewById<Button>(R.id.btnComma).setOnClickListener {
+            if (isNewOperation) {
+                currentInput = "0"
+                isNewOperation = false
+            }
+
+            if (!currentInput.contains(".")) {
+                currentInput += "."
+                tvResult.text = currentInput
+            }
+
+            Log.d(TAG, "Wprowadzono liczbę dziesiętną: $currentInput")
+        }
+
         // 1. Obsługa przycisków cyfr (0-9)
         val numberButtons = listOf(
             Pair(R.id.btn0, "0"),
@@ -90,7 +105,11 @@ class MainActivity : AppCompatActivity() {
                     else -> 0.0
                 }
 
-                tvResult.text = if (result % 1.0 == 0.0) result.toInt().toString() else result.toString()
+                tvResult.text = if (result % 1.0 == 0.0) {
+                    result.toInt().toString()
+                } else {
+                    result.toString().replace('.', ',')
+                }
                 Log.d(TAG, "Wynik operacji: ${tvResult.text}")
 
                 currentInput = tvResult.text.toString()
